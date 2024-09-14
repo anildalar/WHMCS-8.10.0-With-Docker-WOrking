@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whmcs_web3
+    volumes:
+      - ./whmcs:/var/www/html
+      - ./config/php.ini:/usr/local/etc/php/php.ini  # Mount custom php.ini
+    ports:
+      - "6081:80"
+    env_file:
+      - .env  # Load .env file for environment variables
+    networks:
+      - whmcs-network3
+    depends_on:
+      - db3
+
+  db3:
+    image: mysql:8.0
+    container_name: whmcs_db3
+    volumes:
+      - ./db_data:/var/lib/mysql
+    env_file:
+      - .env  # Load .env file for MySQL environment variables
+    networks:
+      - whmcs-network3
+
+  phpmyadmin3:
+    image: phpmyadmin/phpmyadmin
+    container_name: whmcs_phpmyadmin3
+    env_file:
+      - .env  # Load .env file for phpMyAdmin environment variables
+    ports:
+      - "6079:80"
+    depends_on:
+      - db3
+    networks:
+      - whmcs-network3
+
+volumes:
+  db_data:
+
+networks:
+  whmcs-network3:
+    driver: bridge
